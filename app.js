@@ -1,73 +1,79 @@
-const express = require('express')
-const errorhandler = require('errorhandler')
-const mongoose = require('mongoose')
-const logger = require('morgan')
-const cors = require('cors')
-require('dotenv').config()
-const swaggerUi = require('swagger-ui-express')
-const helmet = require('helmet')
-// const swaggerDocument = require('./swagger.json')
+var http = require("http"),
+  path = require("path"),
+  methods = require("methods"),
+  express = require("express"),
+  bodyParser = require("body-parser"),
+  session = require("express-session"),
+  cors = require("cors"),
+  passport = require("passport"),
+  errorhandler = require("errorhandler"),
+  mongoose = require("mongoose");
+const { urlencoded } = require("body-parser");
+const { setegid } = require("process");
 
+var isProduction = process.env.NODE_ENV === "production";
 
-const isProduction = process.env.NODE_ENV === 'production'
-const isTest = process.env.NODE_ENV === 'test'
-const isDevelopment = process.env.NODE_ENV === 'development'
+// Create global app object
+var app = express();
 
-const app = express()
+app.use(cors());
 
+app.use(require('morgan')('dev'))
 
-app.use(helmet())
-app.use(cors())
+app.use(bodyParser(urlencoded({extended: true})))
+app.use(bodyParser.json())
 
-app.use(logger('dev'))
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+app.use(require('method-override'))
+app.use(express.static(__dirname + '/public'))
 
-mongoose.set('useNewUrlParser', true) // đặt trình phân tích cú pháp
-mongoose.set('useCreateIndex', true) // tạo nhiều index trong collection của mongodb
-mongoose.set('useUnifiedTopology', true) //
+app.use(session({secret: 'secret', cookie: {maxAge: 60000}, resave: false, saveUninitialized: false}))
 
 if(!isProduction) {
   app.use(errorhandler())
 }
 
-
-if (isTest) {
-  mongoose.connect(process.env.MONGODB_URI_TEST)
-}
-
-if (isProduction) {
-  mongoose.connect(process.env.MONGODB_URI)
-}
-
-if (isDevelopment) {
-  mongoose.connect(process.env.MONGODB_URI)
-  mongoose.set('debug', true)
-}
-
+// mongoose.connect(process.env.MONGODB_URI)
+// mongoose.set('debug', true)
+mongoose.connect('mongodb://localhost/toiviet');
+mongoose.set('debug', true);
 
 require('./models/User')
-require('./models/Type')
-
+require('./config/passport')
 
 app.use(require('./routes'))
-app.use(function (req, res, next) {
-  const err = new Error('Not Found')
-  err.status = 404
-  next(err)
-})
+
+/// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
 
 
+if (!isProduction) {
+  app.use(function(err, req, res, next) {
+    console.log(err.stack);
 
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500)
-  res.json({
-    errors: {
+    res.status(err.status || 500);
+
+    res.json({'errors': {
       message: err.message,
-      error: {}
-    }
-  })
-})
-const server = app.listen(process.env.PORT || 8000, function() {
-  console.log('Listening on port ' + server.address().port)
-})
+      error: err
+    }});
+  });
+}
+
+
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({'errors': {
+    message: err.message,
+    error: {}
+  }});
+});
+
+
+// finally, let's start our server...
+var server = app.listen( process.env.PORT || 3000, function(){
+  console.log('Listening on port ' + server.address().port);
+});
