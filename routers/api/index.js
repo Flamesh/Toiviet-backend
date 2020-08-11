@@ -3,6 +3,7 @@ const { route } = require('..')
 const router = require('express').Router()
 
 router.use('/', require('./user'))
+router.use('/article', require('./article'))
 
 router.use(function(err, req, res, next) {
     if(err.name === 'ValidationError'){

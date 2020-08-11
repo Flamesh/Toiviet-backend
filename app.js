@@ -8,8 +8,6 @@ var http = require("http"),
   passport = require("passport"),
   errorhandler = require("errorhandler"),
   mongoose = require("mongoose");
-const { urlencoded } = require("body-parser");
-const { setegid } = require("process");
 
 var isProduction = process.env.NODE_ENV === "production";
 
@@ -23,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-app.use(require('method-override'))
+app.use(require('method-override')())
 app.use(express.static(__dirname + '/public'))
 
 app.use(session({secret: 'secret', cookie: {maxAge: 60000}, resave: false, saveUninitialized: false}))
@@ -39,6 +37,8 @@ if(isProduction){
 }
 
 require('./models/User')
+require('./models/Comment')
+require('./models/Article')
 require('./config/passport')
 
 app.use(require('./routers'))

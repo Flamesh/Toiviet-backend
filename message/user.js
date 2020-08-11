@@ -1,8 +1,9 @@
 const auth = {
-    invalid_username: "Sai tên đăng nhập",
-    invalid_password: 'Sai mật khẩu',
-    blank_username: "Không được trống tên đăng nhập",
-    blank_password: "Không được trống mật khẩu",
+    INVALID_USERNAME: "Sai tên đăng nhập",
+    INVALID_PASSWORD: 'Sai mật khẩu',
+    BLANK_USERNAME: "Không được trống tên đăng nhập",
+    BLANK_PASSWORD: "Không được trống mật khẩu",
+    ALREADY_USER: 'Đã có tài khoản trên'
 }
 
 module.exports = auth

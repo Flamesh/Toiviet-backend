@@ -26,34 +26,29 @@ router.get("/user", auth.require, function (req, res, next) {
 //   // only update fields that were actually passed...
 // });
 
-router.post("/user/login", function (req, res, next) {
-  if (!req.body.user.email) {
-    return res.status(422).json({ errors: { email: message.blank_username } });
+router.post('/user/login', function(req, res, next){
+  if(!req.body.user.email){
+    return res.status(422).json({errors: {email: "can't be blank"}});
   }
 
-  if (!req.body.user.passport) {
-    return res
-      .status(422)
-      .json({ errors: { password: message.blank_password } });
+  if(!req.body.user.password){
+    return res.status(422).json({errors: {password: "can't be blank"}});
   }
 
-  passport.authenticate("local", { session: false }, function (
-    err,
-    user,
-    info
-  ) {
-    if (err) return next(err);
+  passport.authenticate('local', {session: false}, function(err, user, info){
+    if(err){ return next(err); }
 
-    if (user) {
-      user.token = user.generateKWT();
-      return res.json({ user: user.toAuthJSON() });
+    if(user){
+      user.token = user.generateJWT();
+      return res.json({user: user.toAuthJSON()});
     } else {
       return res.status(422).json(info);
     }
-  })(req, res, next)
+  })(req, res, next);
 });
 
-router.post('/users/register', function(req, res, next) {
+
+router.post('/user/register', function(req, res, next) {
   let user = new User();
   user.username = req.body.user.username,
   user.email = req.body.user.email,
