@@ -4,6 +4,7 @@ const passport = require("passport");
 const User = mongoose.model("User");
 const auth = require("../auth");
 const message = require("../../message/user");
+const {validate} = require("../../models/User")
 
 router.get("/user", auth.require, function (req, res, next) {
   User.findById(req.payload.id)
@@ -27,6 +28,7 @@ router.get("/user", auth.require, function (req, res, next) {
 // });
 
 router.post('/user/login', function(req, res, next){
+
   if(!req.body.user.email){
     return res.status(422).json({errors: {email: "can't be blank"}});
   }
