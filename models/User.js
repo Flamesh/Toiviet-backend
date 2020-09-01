@@ -39,8 +39,8 @@ UserSchema.plugin(uniqueValidator, { message: message.ALREADY_USER });
 
 function validateUser(user) {
   const Schema = {
-    username: Joi.string().min(5).max(55).required(),
-    email: Joi.string().min(5).max(255).email().required(),
+    email: Joi.string().min(5).max(55).email().required(),
+    password: Joi.string().min(5).max(255).required(),
   };
   return Joi.validate(user, Schema);
 }
